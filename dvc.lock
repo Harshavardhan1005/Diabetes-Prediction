@@ -1,0 +1,60 @@
+schema: '2.0'
+stages:
+  load_data:
+    cmd: python src/load_data.py --config=params.yaml
+    deps:
+    - path: data_given/kaggle_diabetes.csv
+      md5: 61eefdd65e4b474c3b4614c51ca93ff0
+      size: 62058
+    - path: src/get_data.py
+      md5: 29d0d3ce6122c16062cc0f847b906597
+      size: 648
+    - path: src/load_data.py
+      md5: 7cc0a1eaafa5be348dc2ca27b7c3c419
+      size: 653
+    outs:
+    - path: data/raw/kaggle_diabetes.csv
+      md5: e8f41ee0ef40dc1efb9fba638227c94c
+      size: 62518
+  split_data:
+    cmd: python src/split_data.py --config=params.yaml
+    deps:
+    - path: data/raw/kaggle_diabetes.csv
+      md5: e8f41ee0ef40dc1efb9fba638227c94c
+      size: 62518
+    - path: src/split_data.py
+      md5: fe0138e36a87531d7c48d85207f4794c
+      size: 1086
+    outs:
+    - path: data/processed/test.csv
+      md5: fe65fb7605f50c842fd47c39291f606b
+      size: 12586
+    - path: data/processed/train.csv
+      md5: 20d51066a994e6a03a58647782108dc8
+      size: 50030
+  train_and_evaluate:
+    cmd: python src/train_and_evaluate.py --config=params.yaml
+    deps:
+    - path: data/processed/test.csv
+      md5: fe65fb7605f50c842fd47c39291f606b
+      size: 12586
+    - path: data/processed/train.csv
+      md5: 20d51066a994e6a03a58647782108dc8
+      size: 50030
+    - path: src/train_and_evaluate.py
+      md5: 1b07d8f42546135e0eaea6ed26f573c9
+      size: 2557
+    params:
+      params.yaml:
+        estimators.ElasticNet.params.alpha: 0.9
+        estimators.ElasticNet.params.l1_ratio: 0.4
+    outs:
+    - path: models/model.joblib
+      md5: a6bc6d959be875a726b4f5da7ae80dab
+      size: 698
+    - path: reports/params.json
+      md5: a4aab0167612f21a6085dd05cfafdbf6
+      size: 44
+    - path: reports/scores.json
+      md5: 0d606370514c88ad73fe5cbd09a8cb68
+      size: 101
