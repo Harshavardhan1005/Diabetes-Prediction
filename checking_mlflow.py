@@ -1,20 +1,20 @@
-# load the train and test
-# train algo
-# save the metrices, params
 import os
 import warnings
 import sys
+
 import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.model_selection import train_test_split
-import mlflow
-from urllib.parse import urlparse
 from sklearn.linear_model import ElasticNet
-from get_data import read_params
-import argparse
-import joblib
-import json
+from urllib.parse import urlparse
+import mlflow
+import mlflow.sklearn
+
+import logging
+
+logging.basicConfig(level=logging.WARN)
+logger = logging.getLogger(__name__)
 
 
 def eval_metrics(actual, pred):
@@ -24,31 +24,34 @@ def eval_metrics(actual, pred):
     return rmse, mae, r2
 
 
-def train_and_evaluate(config_path):
-    config = read_params(config_path)
-    test_data_path = config["split_data"]["test_path"]
-    train_data_path = config["split_data"]["train_path"]
-    random_state = config["base"]["random_state"]
-    model_dir = config["model_dir"]
+if __name__ == "__main__":
+    warnings.filterwarnings("ignore")
+    np.random.seed(40)
 
-    alpha = config["estimators"]["ElasticNet"]["params"]["alpha"]
-    l1_ratio = config["estimators"]["ElasticNet"]["params"]["l1_ratio"]
+    # Read the wine-quality csv file from the URL
+    csv_url = (
+        "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"
+    )
+    try:
+        data = pd.read_csv(csv_url, sep=";")
+    except Exception as e:
+        logger.exception(
+            "Unable to download training & test CSV, check your internet connection. Error: %s", e
+        )
 
-    target = [config["base"]["target_col"]]
+    # Split the data into training and test sets. (0.75, 0.25) split.
+    train, test = train_test_split(data)
 
-    train = pd.read_csv(train_data_path, sep=",")
-    test = pd.read_csv(test_data_path, sep=",")
+    # The predicted column is "quality" which is a scalar from [3, 9]
+    train_x = train.drop(["quality"], axis=1)
+    test_x = test.drop(["quality"], axis=1)
+    train_y = train[["quality"]]
+    test_y = test[["quality"]]
 
-    train_y = train[target]
-    test_y = test[target]
+    alpha = float(sys.argv[1]) if len(sys.argv) > 1 else 0.5
+    l1_ratio = float(sys.argv[2]) if len(sys.argv) > 2 else 0.5
 
-    train_x = train.drop(target, axis=1)
-    test_x = test.drop(target, axis=1)
-
-    mlflow.set_tracking_uri("http://127.0.0.1:1234")
-    mlflow.set_experiment("mlflow_demo")
-
-    with mlflow.start_run(run_name="LRmodel") as mlops_run:
+    with mlflow.start_run():
         lr = ElasticNet(alpha=alpha, l1_ratio=l1_ratio, random_state=42)
         lr.fit(train_x, train_y)
 
@@ -67,11 +70,7 @@ def train_and_evaluate(config_path):
         mlflow.log_metric("r2", r2)
         mlflow.log_metric("mae", mae)
 
-
-
-
         tracking_url_type_store = urlparse(mlflow.get_tracking_uri()).scheme
-        print(">>>>> tracking_url_type_store: ", tracking_url_type_store)
 
         # Model registry does not work with file store
         if tracking_url_type_store != "file":
@@ -80,13 +79,6 @@ def train_and_evaluate(config_path):
             # There are other ways to use the Model Registry, which depends on the use case,
             # please refer to the doc for more information:
             # https://mlflow.org/docs/latest/model-registry.html#api-workflow
-            mlflow.sklearn.log_model(lr, "model", registered_model_name="ElasticnetDiabetesmodel")
+            mlflow.sklearn.log_model(lr, "model", registered_model_name="ElasticnetWineModel")
         else:
             mlflow.sklearn.log_model(lr, "model")
-
-
-if __name__ == "__main__":
-    args = argparse.ArgumentParser()
-    args.add_argument("--config", default="params.yaml")
-    parsed_args = args.parse_args()
-    train_and_evaluate(config_path=parsed_args.config)
