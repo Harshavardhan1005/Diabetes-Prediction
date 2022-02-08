@@ -6,6 +6,7 @@ import os
 import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from sklearn.linear_model import ElasticNet
 from sklearn.ensemble import RandomForestClassifier
 from get_data import read_params
 import argparse
@@ -27,6 +28,8 @@ def train_and_evaluate(config_path):
     random_state = config["base"]["random_state"]
     model_dir = config["model_dir"]
 
+    #alpha = config["estimators"]["ElasticNet"]["params"]["alpha"]
+    #l1_ratio = config["estimators"]["ElasticNet"]["params"]["l1_ratio"]
     n_estimators = config["estimators"]["RandomforestClassifier"]["params"]["n_estimators"]
 
     target = [config["base"]["target_col"]]
@@ -41,11 +44,13 @@ def train_and_evaluate(config_path):
     test_x = test.drop(target, axis=1)
 
 
+
     lr = RandomForestClassifier(
         n_estimators=n_estimators
     )
     lr.fit(train_x, train_y)
 
+    print(lr.get_params())
     predicted_qualities = lr.predict(test_x)
 
     (rmse, mae, r2) = eval_metrics(test_y, predicted_qualities)
@@ -76,6 +81,7 @@ def train_and_evaluate(config_path):
     model_path = os.path.join(model_dir, "model.joblib")
 
     joblib.dump(lr, model_path)
+
 
 
 if __name__ == "__main__":
