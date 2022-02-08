@@ -15,10 +15,13 @@ split_data:
   test_size: 0.2
 
 estimators:
-  ElasticNet:
+#  ElasticNet:
+#    params:
+#      alpha: 0.9
+#      l1_ratio: 0.4
+  RandomforestClassifier:
     params:
-      alpha: 0.9
-      l1_ratio: 0.4
+      n_estimators: 100
 model_dir: models
 
 reports:
