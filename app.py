@@ -10,20 +10,21 @@ template_dir = os.path.join(webapp_root, "templates")
 
 app = Flask(__name__, static_folder=static_dir,template_folder=template_dir)
 
+@app.route('/')
+def home():
+    return render_template('index1.html')
 
-@app.route("/", methods=["GET", "POST"])
-def index():
-
+@app.route('/predict', methods=['POST'])
+def predict():
     if request.method == "POST":
         try:
             if request.form:
                 dict_req = dict(request.form)
                 response = prediction.form_response(dict_req)
                 print(response)
-                return render_template("index.html", response=response)
+                return render_template("result.html", prediction=response)
             elif request.json:
                 response = prediction.api_response(request.json)
-                print(response)
                 return jsonify(response)
 
         except Exception as e:
@@ -31,7 +32,7 @@ def index():
 
             return render_template("404.html", error=error)
     else:
-        return render_template("index.html")
+        return render_template("index1.html")
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)

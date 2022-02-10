@@ -31,11 +31,7 @@ def predict(data):
     model_dir_path = config["webapp_model_dir"]
     model = joblib.load(model_dir_path)
     prediction = model.predict(data)
-    print(prediction)
-    if prediction == 1:
-        return 'Oops! You have DIABETES.'
-    else:
-        return "Great! You DON'T have diabetes."
+    return prediction
 
 
 def get_schema(schema_path=schema_path):
