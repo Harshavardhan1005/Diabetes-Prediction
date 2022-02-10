@@ -21,14 +21,14 @@
         <!-- Text Area -->
     	<div class="ml-container">
     		<form action="{{ url_for('predict') }}" method="POST">
-                <input class="form-input" type="text" name="Pregnancies" placeholder="Pregnancies expected range 0.0 to 17.0"><br>
-                <input class="form-input" type="text" name="Glucose" placeholder="Glucose expected range 0.0 to 199.0"><br>
-                <input class="form-input" type="text" name="BloodPressure" placeholder="BloodPressure expected range 0.0 to 122.0"><br>
-                <input class="form-input" type="text" name="SkinThickness" placeholder="SkinThickness expected range 0.0 to 110.0"><br>
-                <input class="form-input" type="text" name="Insulin" placeholder="Insulin expected range 0.0 to 744.0"><br>
-                <input class="form-input" type="text" name="BMI" placeholder="BMI expected range 0.0 to 80.6"><br>
-                <input class="form-input" type="text" name="DiabetesPedigreeFunction" placeholder="DiabetesPedigreeFunction expected range 0.078 to 2.42"><br>
-                <input class="form-input" type="text" name="Age" placeholder="Age expected range 21.0 to 81.0"><br>
+                <input class="form-input" type="text" name="Pregnancies" placeholder="Pregnancies expected range 0.0 to 17.0" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');"><br>
+                <input class="form-input" type="text" name="Glucose" placeholder="Glucose expected range 0.0 to 199.0" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');"><br>
+                <input class="form-input" type="text" name="BloodPressure" placeholder="BloodPressure expected range 0.0 to 122.0" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');"><br>
+                <input class="form-input" type="text" name="SkinThickness" placeholder="SkinThickness expected range 0.0 to 110.0" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');"><br>
+                <input class="form-input" type="text" name="Insulin" placeholder="Insulin expected range 0.0 to 744.0" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');"><br>
+                <input class="form-input" type="text" name="BMI" placeholder="BMI expected range 0.0 to 80.6" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');"><br>
+                <input class="form-input" type="text" name="DiabetesPedigreeFunction" placeholder="DiabetesPedigreeFunction expected range 0.078 to 2.42" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');"><br>
+                <input class="form-input" type="text" name="Age" placeholder="Age expected range 21.0 to 81.0" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');"><br>
 
         		<input type="submit" class="my-cta-button" value="Predict">
         	</form>
