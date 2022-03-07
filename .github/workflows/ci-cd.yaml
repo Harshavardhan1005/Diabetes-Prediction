@@ -1,4 +1,4 @@
-name: Python application
+name: Diabetes application Deplozment
 
 on:
   push:
